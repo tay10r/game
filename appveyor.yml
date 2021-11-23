@@ -9,6 +9,9 @@ before_build:
   - cmd: mkdir build
   - cmd: cmake -B build -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake
 
+after_build:
+  - cmd: cpack -G ZIP
+
 build:
   verbosity: normal
 
