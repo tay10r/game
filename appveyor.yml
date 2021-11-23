@@ -1,0 +1,24 @@
+image:
+  - Visual Studio 2019
+
+configuration:
+  - Debug
+  - Release
+
+before_build:
+  - cmd: mkdir build
+  - cmd: cmake -B build -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake
+
+build:
+  verbosity: normal
+
+cache: C:\Tools\vcpkg\installed
+
+install:
+  - cd C:\Tools\vcpkg
+  - git pull
+  - .\bootstrap-vcpkg.bat
+  - cd %APPVEYOR_BUILD_FOLDER%
+  - vcpkg install glfw:x64-windows
+
+
