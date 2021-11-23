@@ -21,7 +21,7 @@ install:
   - cd C:\Tools\vcpkg
   - git pull
   - .\bootstrap-vcpkg.bat
-  - cd $(APPVEYOR_BUILD_FOLDER)
+  - cd %APPVEYOR_BUILD_FOLDER%
   - vcpkg install glfw3:x64-windows
 
 artifacts:
