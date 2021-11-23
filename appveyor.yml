@@ -22,5 +22,5 @@ install:
   - vcpkg install glfw3:x64-windows
 
 artifacts:
-  - path: build/Release/main.exe
+  - path: build/game-0.1.1-win64.zip
     name: Release
