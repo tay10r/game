@@ -21,4 +21,6 @@ install:
   - cd %APPVEYOR_BUILD_FOLDER%
   - vcpkg install glfw3:x64-windows
 
-
+artifacts:
+  - path: build/Release/main.exe
+    name: Release
