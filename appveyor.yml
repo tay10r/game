@@ -19,6 +19,6 @@ install:
   - git pull
   - .\bootstrap-vcpkg.bat
   - cd %APPVEYOR_BUILD_FOLDER%
-  - vcpkg install glfw:x64-windows
+  - vcpkg install glfw3:x64-windows
 
 
