@@ -16,6 +16,7 @@
 
 #include "Settings.h"
 
+#include "GLFWEventObserver.h"
 #include "play/play.h"
 #include "startup-menu/runStartupMenu.h"
 
@@ -42,7 +43,7 @@ main()
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
   glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 
-  GLFWwindow* window = glfwCreateWindow(1280, 720, PROJECT_NAME, nullptr, nullptr);
+  GLFWwindow* window = glfwCreateWindow(1280, 720, PROJECT_NAME, glfwGetPrimaryMonitor(), nullptr);
 
   if (!window) {
     std::cerr << "Failed to create GLFW window." << std::endl;
@@ -56,6 +57,10 @@ main()
 
   glfwSwapInterval(1);
 
+  CompositeGLFWEventObserver compositeEventObserver;
+
+  GLFWEventObserver::install(window, &compositeEventObserver);
+
   float xScale = 1.0f;
   float yScale = 1.0f;
   glfwGetWindowContentScale(window, &xScale, &yScale);
@@ -66,7 +71,7 @@ main()
 
   ImGui::CreateContext();
 
-  ImGui_ImplGlfw_InitForOpenGL(window, true);
+  ImGui_ImplGlfw_InitForOpenGL(window, false);
 
   ImGui_ImplOpenGL3_Init("#version 300 es");
 
@@ -80,12 +85,16 @@ main()
   style.WindowRounding = 5 * xScale;
   style.ItemSpacing = ImVec2(5 * xScale, 5 * yScale);
 
+  ImGuiProxy imGuiProxy(window);
+
+  compositeEventObserver.addEventObserver(&imGuiProxy);
+
   const std::string selectedProfile = runStartupMenu(window, fontSize);
 
   int exitCode = EXIT_SUCCESS;
 
   if (!selectedProfile.empty()) {
-    exitCode = play(window, selectedProfile.c_str(), fontSize) ? EXIT_SUCCESS : EXIT_FAILURE;
+    exitCode = play(window, &compositeEventObserver, selectedProfile.c_str(), fontSize) ? EXIT_SUCCESS : EXIT_FAILURE;
   }
 
   ImGui_ImplOpenGL3_Shutdown();

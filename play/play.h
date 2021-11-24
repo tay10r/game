@@ -2,5 +2,7 @@
 
 #include <GLFW/glfw3.h>
 
+class CompositeGLFWEventObserver;
+
 bool
-play(GLFWwindow* window, const char* profilePath, int fontSize);
+play(GLFWwindow* window, CompositeGLFWEventObserver*, const char* profilePath, int fontSize);

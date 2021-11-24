@@ -1,18 +1,29 @@
 #include "play.h"
 
+#include "Game.h"
+
 #include <glad/glad.h>
 
+#include <uv.h>
+
 bool
-play(GLFWwindow* window, const char* profilePath, int fontSize)
+play(GLFWwindow* window, CompositeGLFWEventObserver* compositeEventObserver, const char* profilePath, int fontSize)
 {
-  while (!glfwWindowShouldClose(window)) {
+  uv_loop_t loop;
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  uv_loop_init(&loop);
 
-    glfwSwapBuffers(window);
+  Game game(&loop, window, fontSize);
 
-    glfwPollEvents();
-  }
+  game.connectEventObservers(compositeEventObserver);
+
+  game.start();
+
+  uv_run(&loop, UV_RUN_DEFAULT);
+
+  game.stop();
+
+  uv_loop_close(&loop);
 
   return false;
 }
