@@ -9,6 +9,9 @@ before_build:
   - cmd: mkdir build-%CONFIGURATION%
   - cmd: cmake . -B build-%CONFIGURATION% -DCMAKE_INSTALL_PREFIX=install
 
+build:
+  project: build-%CONFIGURATION%\game.sln
+
 after_build:
   - cmd: cd build-%CONFIGURATION% && cpack -G ZIP -C %CONFIGURATION%
 
