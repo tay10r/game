@@ -6,7 +6,7 @@ configuration:
   - Release
 
 before_build:
-  - cmd: cmake --build deps/build --target install
+  - cmd: cmake --build deps\build --target install
   - cmd: mkdir build
   - cmd: cmake . -B build -DCMAKE_INSTALL_PREFIX=install
 
@@ -16,13 +16,13 @@ after_build:
 build:
   verbosity: minimal
 
-cache: deps/build
+cache: deps\build
 
 install:
-  - mkdir deps/build
-  - cmake -B deps/build deps -DCMAKE_INSTALL_PREFIX=install
-  - cmake --build deps/build -C Release
+  - mkdir deps\build
+  - cmake -B deps\build deps -DCMAKE_INSTALL_PREFIX=install
+  - cmake --build deps\build -C Release
 
 artifacts:
-  - path: build/game-0.1.1-win64.zip
+  - path: build\game-0.1.1-win64.zip
     name: $(CONFIGURATION)
