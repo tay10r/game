@@ -10,7 +10,7 @@ add_executable(main WIN32
   startup-menu/runStartupMenu.h
   startup-menu/runStartupMenu.cpp)
 
-target_compile_definitions(main PRIVATE GLFW_INCLUDE_NONE=1)
+target_compile_definitions(main PRIVATE GLFW_INCLUDE_NONE=1 "ASSETS_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/assets\"")
 
 target_link_libraries(main PRIVATE glfw glad uv imgui)
 

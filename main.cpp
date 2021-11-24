@@ -48,6 +48,12 @@ main()
 
   glfwSwapInterval(1);
 
+  float xScale = 1.0f;
+  float yScale = 1.0f;
+  glfwGetWindowContentScale(window, &xScale, &yScale);
+
+  const float fontSize = 32 * xScale;
+
   IMGUI_CHECKVERSION();
 
   ImGui::CreateContext();
@@ -55,6 +61,10 @@ main()
   ImGui_ImplGlfw_InitForOpenGL(window, true);
 
   ImGui_ImplOpenGL3_Init("#version 300 es");
+
+  ImGuiIO& io = ImGui::GetIO();
+
+  io.Fonts->AddFontFromFileTTF(ASSETS_DIR "/fonts/Roboto-Medium.ttf", fontSize);
 
   runStartupMenu(window);
 
