@@ -1,5 +1,7 @@
 #include <GLFW/glfw3.h>
 
+#include <glad/glad.h>
+
 #include <iostream>
 
 #include <cstdlib>
@@ -7,6 +9,8 @@
 #ifdef _WIN32
 #include <windows.h>
 #endif
+
+#include "startup-menu/runStartupMenu.h"
 
 #ifdef _WIN32
 INT WINAPI WinMain(HINSTANCE, HINSTANCE, PSTR, INT)
@@ -30,10 +34,13 @@ main()
     return EXIT_FAILURE;
   }
 
-  while (!glfwWindowShouldClose(window)) {
+  glfwMakeContextCurrent(window);
 
-    glfwPollEvents();
-  }
+  gladLoadGLES2Loader((GLADloadproc)glfwGetProcAddress);
+
+  glfwSwapInterval(1);
+
+  runStartupMenu(window);
 
   glfwDestroyWindow(window);
 
