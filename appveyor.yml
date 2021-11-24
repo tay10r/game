@@ -6,23 +6,22 @@ configuration:
   - Release
 
 before_build:
+  - cmd: cmake --build deps/build --target install
   - cmd: mkdir build
-  - cmd: cmake -B build -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake
+  - cmd: cmake . -B build -DCMAKE_INSTALL_PREFIX=install
 
 after_build:
   - cmd: cd build && cpack -G ZIP -C %CONFIGURATION%
 
 build:
-  verbosity: normal
+  verbosity: minimal
 
-cache: C:\Tools\vcpkg\installed
+cache: deps/build
 
 install:
-  - cd C:\Tools\vcpkg
-  - git pull
-  - .\bootstrap-vcpkg.bat
-  - cd %APPVEYOR_BUILD_FOLDER%
-  - vcpkg install glfw3:x64-windows
+  - mkdir deps/build
+  - cmake -B deps/build deps -DCMAKE_INSTALL_PREFIX=install
+  - cmake --build deps/build -C Release
 
 artifacts:
   - path: build/game-0.1.1-win64.zip

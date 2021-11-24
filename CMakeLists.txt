@@ -13,7 +13,7 @@ add_executable(main WIN32
 
 target_compile_definitions(main PRIVATE GLFW_INCLUDE_NONE=1)
 
-target_link_libraries(main PRIVATE glfw glad)
+target_link_libraries(main PRIVATE glfw glad uv)
 
 install(TARGETS main
   RUNTIME DESTINATION bin
