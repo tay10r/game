@@ -14,6 +14,8 @@
 #include <windows.h>
 #endif
 
+#include "Settings.h"
+
 #include "startup-menu/runStartupMenu.h"
 
 #ifdef _WIN32
@@ -23,6 +25,11 @@ int
 main()
 #endif
 {
+  if (!Settings::init()) {
+    std::cerr << "Failed to create settings directory." << std::endl;
+    return EXIT_FAILURE;
+  }
+
   if (glfwInit() != GLFW_TRUE) {
     std::cerr << "Failed to initialize GLFW." << std::endl;
     return EXIT_FAILURE;
@@ -34,7 +41,7 @@ main()
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
   glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 
-  GLFWwindow* window = glfwCreateWindow(1280, 720, "", nullptr, nullptr);
+  GLFWwindow* window = glfwCreateWindow(1280, 720, PROJECT_NAME, nullptr, nullptr);
 
   if (!window) {
     std::cerr << "Failed to create GLFW window." << std::endl;
@@ -52,7 +59,7 @@ main()
   float yScale = 1.0f;
   glfwGetWindowContentScale(window, &xScale, &yScale);
 
-  const float fontSize = 32 * xScale;
+  const float fontSize = 24 * xScale;
 
   IMGUI_CHECKVERSION();
 
@@ -63,10 +70,20 @@ main()
   ImGui_ImplOpenGL3_Init("#version 300 es");
 
   ImGuiIO& io = ImGui::GetIO();
-
   io.Fonts->AddFontFromFileTTF(ASSETS_DIR "/fonts/Roboto-Medium.ttf", fontSize);
 
-  runStartupMenu(window);
+  ImGuiStyle& style = ImGui::GetStyle();
+  style.WindowTitleAlign = ImVec2(0.5, 0.5);
+  style.FrameRounding = 5 * xScale;
+  style.ScrollbarRounding = 5 * xScale;
+  style.WindowRounding = 5 * xScale;
+  style.ItemSpacing = ImVec2(5 * xScale, 5 * yScale);
+
+  const std::string selectedProfile = runStartupMenu(window, fontSize);
+
+  if (!selectedProfile.empty()) {
+    // TODO
+  }
 
   ImGui_ImplOpenGL3_Shutdown();
 

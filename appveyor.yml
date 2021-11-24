@@ -7,7 +7,7 @@ configuration:
 
 before_build:
   - cmd: mkdir build-%CONFIGURATION%
-  - cmd: cmake . -B build-%CONFIGURATION% -DCMAKE_INSTALL_PREFIX=install
+  - cmd: cmake . -B build-%CONFIGURATION%
 
 build:
   project: build-%CONFIGURATION%\game.sln
