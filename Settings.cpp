@@ -190,7 +190,7 @@ bool
 Settings::createDirectory(const std::string& path)
 {
 #ifdef _WIN32
-  CreateDirectoryA(path.c_str());
+  CreateDirectoryA(path.c_str(), nullptr);
   return true;
 #elif __unix__
   mkdir(path.c_str(), 0700);

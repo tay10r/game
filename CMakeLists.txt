@@ -10,7 +10,9 @@ add_executable(main WIN32
   Settings.h
   Settings.cpp
   startup-menu/runStartupMenu.h
-  startup-menu/runStartupMenu.cpp)
+  startup-menu/runStartupMenu.cpp
+  play/play.h
+  play/play.cpp)
 
 target_compile_definitions(main
   PRIVATE

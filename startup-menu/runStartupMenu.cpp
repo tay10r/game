@@ -36,7 +36,6 @@ public:
   }
 
   std::string name(size_t index) const noexcept
-
   {
     if (index >= m_names.size())
       return "<null>";
@@ -118,8 +117,15 @@ runStartupMenu(GLFWwindow* window, int fontSize)
 
       const bool selected = (i == selectedProfileIndex);
 
-      if (ImGui::Selectable(profileList.name(i).c_str(), selected))
+      const ImGuiSelectableFlags selectableFlags = ImGuiSelectableFlags_AllowDoubleClick;
+
+      if (ImGui::Selectable(profileList.name(i).c_str(), selected, selectableFlags)) {
+
         selectedProfileIndex = i;
+
+        if (ImGui::IsMouseDoubleClicked(0))
+          selectedProfile = profileList.path(selectedProfileIndex);
+      }
     }
 
     if (ImGui::Button("New")) {

@@ -16,6 +16,7 @@
 
 #include "Settings.h"
 
+#include "play/play.h"
 #include "startup-menu/runStartupMenu.h"
 
 #ifdef _WIN32
@@ -81,8 +82,10 @@ main()
 
   const std::string selectedProfile = runStartupMenu(window, fontSize);
 
+  int exitCode = EXIT_SUCCESS;
+
   if (!selectedProfile.empty()) {
-    // TODO
+    exitCode = play(window, selectedProfile.c_str(), fontSize) ? EXIT_SUCCESS : EXIT_FAILURE;
   }
 
   ImGui_ImplOpenGL3_Shutdown();
@@ -95,5 +98,5 @@ main()
 
   glfwTerminate();
 
-  return EXIT_SUCCESS;
+  return exitCode;
 }
