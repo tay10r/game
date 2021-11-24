@@ -6,11 +6,11 @@ configuration:
   - Release
 
 before_build:
-  - cmd: mkdir $(CONFIGURATION)-build
-  - cmd: cmake -B $(CONFIGURATION)-build -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake
+  - cmd: mkdir build
+  - cmd: cmake -B build -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake
 
 after_build:
-  - cmd: cd $(CONFIGURATION)-build && cpack -G ZIP -C %CONFIGURATION%
+  - cmd: cd build && cpack -G ZIP -C %CONFIGURATION%
 
 build:
   verbosity: normal
@@ -25,5 +25,5 @@ install:
   - vcpkg install glfw3:x64-windows
 
 artifacts:
-  - path: $(CONFIGURATION)-build/game-0.1.1-win64.zip
+  - path: build/game-0.1.1-win64.zip
     name: $(CONFIGURATION)
