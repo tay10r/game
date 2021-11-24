@@ -32,7 +32,7 @@ target_compile_definitions(main
     "ASSETS_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/assets\""
     "PROJECT_NAME=\"${PROJECT_NAME}\"")
 
-target_link_libraries(main PRIVATE glfw glad uv imgui platformfolders)
+target_link_libraries(main PRIVATE glfw glad glm uv imgui platformfolders)
 
 install(TARGETS main
   RUNTIME DESTINATION bin
