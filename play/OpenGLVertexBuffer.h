@@ -7,8 +7,6 @@
 #include <cassert>
 #include <cstddef>
 
-namespace sf {
-
 template<typename Attrib>
 struct OpenGLVertexAttribTraits final
 {};
@@ -16,7 +14,9 @@ struct OpenGLVertexAttribTraits final
 template<>
 struct OpenGLVertexAttribTraits<float> final
 {
-  static constexpr GLint size() { return 1; }
+  static constexpr GLint tupleSize() { return 1; }
+
+  static constexpr GLint byteSize() { return 4; }
 
   static constexpr GLenum type() { return GL_FLOAT; }
 
@@ -26,7 +26,9 @@ struct OpenGLVertexAttribTraits<float> final
 template<>
 struct OpenGLVertexAttribTraits<glm::vec2> final
 {
-  static constexpr GLint size() { return 2; }
+  static constexpr GLint tupleSize() { return 2; }
+
+  static constexpr GLint byteSize() { return 8; }
 
   static constexpr GLenum type() { return GL_FLOAT; }
 
@@ -36,7 +38,9 @@ struct OpenGLVertexAttribTraits<glm::vec2> final
 template<>
 struct OpenGLVertexAttribTraits<glm::vec3> final
 {
-  static constexpr GLint size() { return 3; }
+  static constexpr GLint tupleSize() { return 3; }
+
+  static constexpr GLint byteSize() { return 12; }
 
   static constexpr GLenum type() { return GL_FLOAT; }
 
@@ -46,76 +50,54 @@ struct OpenGLVertexAttribTraits<glm::vec3> final
 template<>
 struct OpenGLVertexAttribTraits<glm::vec4> final
 {
-  static constexpr GLint size() { return 4; }
+  static constexpr GLint tupleSize() { return 4; }
+
+  static constexpr GLint byteSize() { return 16; }
 
   static constexpr GLenum type() { return GL_FLOAT; }
 
   static constexpr GLboolean normalized() { return GL_FALSE; }
 };
 
+template<typename Attrib, typename... Attribs>
+struct OpenGLVertex final
+{
+  static constexpr GLint byteSize()
+  {
+    return OpenGLVertexAttribTraits<Attrib>::byteSize() + OpenGLVertex<Attribs...>::byteSize();
+  }
+
+  static void init(GLsizei stride, int index = 0, unsigned char* ptrOffset = nullptr)
+  {
+    using Traits = OpenGLVertexAttribTraits<Attrib>;
+
+    glEnableVertexAttribArray(index);
+
+    glVertexAttribPointer(index, Traits::tupleSize(), Traits::type(), Traits::normalized(), stride, ptrOffset);
+
+    OpenGLVertex<Attribs...>::init(stride, index + 1, ptrOffset + Traits::byteSize());
+  }
+};
+
+template<typename Attrib>
+struct OpenGLVertex<Attrib> final
+{
+  static constexpr GLint byteSize() { return OpenGLVertexAttribTraits<Attrib>::byteSize(); }
+
+  static void init(GLsizei stride, int index = 0, unsigned char* ptrOffset = nullptr)
+  {
+    using Traits = OpenGLVertexAttribTraits<Attrib>;
+
+    glEnableVertexAttribArray(index);
+
+    glVertexAttribPointer(index, Traits::tupleSize(), Traits::type(), Traits::normalized(), stride, ptrOffset);
+  }
+};
+
 template<typename... Attribs>
 class OpenGLVertexBuffer final
 {
 public:
-  template<typename Attrib, typename... Others>
-  struct GenericVertex final
-  {
-    Attrib attrib;
-
-    GenericVertex<Others...> others;
-
-    template<int index>
-    constexpr auto& attribAt() noexcept
-    {
-      if constexpr (index == 0)
-        return attrib;
-      else
-        return others.template attribAt<index - 1>();
-    }
-
-    static constexpr size_t bytesPerVertex() { return sizeof(Attrib) + GenericVertex<Others...>::bytesPerVertex(); }
-
-    static void enableAll(GLuint attribIndex, size_t offset, size_t bytesPerVertex)
-    {
-      using Traits = OpenGLVertexAttribTraits<Attrib>;
-
-      glEnableVertexAttribArray(attribIndex);
-
-      glVertexAttribPointer(
-        attribIndex, Traits::size(), Traits::type(), Traits::normalized(), bytesPerVertex, (const void*)offset);
-
-      GenericVertex<Others...>::enableAll(attribIndex + 1, offset + sizeof(Attrib), bytesPerVertex);
-    }
-  };
-
-  template<typename LastAttrib>
-  struct GenericVertex<LastAttrib> final
-  {
-    LastAttrib attrib;
-
-    template<int index>
-    constexpr LastAttrib& attribAt() noexcept
-    {
-      static_assert(index == 0, "Attribute index is out of bounds.");
-
-      return attrib;
-    }
-
-    static constexpr size_t bytesPerVertex() { return sizeof(LastAttrib); }
-
-    static void enableAll(GLuint attribIndex, size_t offset, size_t bytesPerVertex)
-    {
-      using Traits = OpenGLVertexAttribTraits<LastAttrib>;
-
-      glEnableVertexAttribArray(attribIndex);
-
-      glVertexAttribPointer(
-        attribIndex, Traits::size(), Traits::type(), Traits::normalized(), bytesPerVertex, (const void*)offset);
-    }
-  };
-
-  using Vertex = GenericVertex<Attribs...>;
-
   OpenGLVertexBuffer();
 
   OpenGLVertexBuffer(OpenGLVertexBuffer&&);
@@ -146,7 +128,7 @@ public:
   /// @param data The vertices to write to the buffer.
   ///
   /// @param vertexCount The number of vertices to write to the buffer.
-  void write(size_t offset, const Vertex* data, size_t vertexCount);
+  void write(size_t offset, const void* data, size_t vertexCount);
 
   /// Gets the number of vertices in the buffer.
   ///
@@ -172,7 +154,7 @@ OpenGLVertexBuffer<Attribs...>::OpenGLVertexBuffer()
 
   glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 
-  Vertex::enableAll(0, 0, Vertex::bytesPerVertex());
+  OpenGLVertex<Attribs...>::init(OpenGLVertex<Attribs...>::byteSize());
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -206,24 +188,22 @@ OpenGLVertexBuffer<Attribs...>::allocate(size_t vertexCount, GLenum usage)
 {
   assert(m_boundFlag);
 
-  static_assert(sizeof(Vertex) == Vertex::bytesPerVertex());
-
-  const size_t totalSize = vertexCount * Vertex::bytesPerVertex();
+  const size_t totalSize = vertexCount * OpenGLVertex<Attribs...>::byteSize();
 
   glBufferData(GL_ARRAY_BUFFER, totalSize, nullptr, usage);
 }
 
 template<typename... Attribs>
 void
-OpenGLVertexBuffer<Attribs...>::write(size_t offset, const Vertex* vertices, size_t vertexCount)
+OpenGLVertexBuffer<Attribs...>::write(size_t offset, const void* vertices, size_t vertexCount)
 {
   assert(m_boundFlag);
 
-  static_assert(sizeof(Vertex) == Vertex::bytesPerVertex());
+  using Vertex = OpenGLVertex<Attribs...>;
 
-  const size_t byteOffset = Vertex::bytesPerVertex() * offset;
+  const size_t byteOffset = Vertex::byteSize() * offset;
 
-  const size_t byteCount = Vertex::bytesPerVertex() * vertexCount;
+  const size_t byteCount = Vertex::byteSize() * vertexCount;
 
   glBufferSubData(GL_ARRAY_BUFFER, byteOffset, byteCount, vertices);
 }
@@ -264,7 +244,5 @@ OpenGLVertexBuffer<Attribs...>::getVertexCount() const
 
   glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
 
-  return size_t(size) / Vertex::bytesPerVertex();
+  return size_t(size) / OpenGLVertex<Attribs...>::byteSize();
 }
-
-} // namespace sf

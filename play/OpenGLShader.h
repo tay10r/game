@@ -6,8 +6,6 @@
 
 #include <cassert>
 
-namespace sf {
-
 class OpenGLShader final
 {
 public:
@@ -86,5 +84,3 @@ private:
 
   GLuint m_shaderID = 0;
 };
-
-} // namespace sf

@@ -15,6 +15,8 @@ add_executable(main WIN32
   startup-menu/runStartupMenu.cpp
   play/play.h
   play/play.cpp
+  play/Atmosphere.h
+  play/Atmosphere.cpp
   play/Game.h
   play/Game.cpp
   play/Scene.h

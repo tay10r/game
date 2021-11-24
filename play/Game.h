@@ -67,6 +67,8 @@ class Game final
 public:
   Game(uv_loop_t* loop, GLFWwindow* window, int fontSize);
 
+  bool compileShaders(std::ostream& errStream);
+
   bool windowShouldClose() { return glfwWindowShouldClose(m_window); }
 
   void connectEventObservers(CompositeGLFWEventObserver*);

@@ -41,7 +41,6 @@ main()
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
-  glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 
   GLFWwindow* window = glfwCreateWindow(1280, 720, PROJECT_NAME, glfwGetPrimaryMonitor(), nullptr);
 
@@ -60,6 +59,15 @@ main()
   CompositeGLFWEventObserver compositeEventObserver;
 
   GLFWEventObserver::install(window, &compositeEventObserver);
+
+  WindowViewportResizer viewportResizer;
+
+  compositeEventObserver.addEventObserver(&viewportResizer);
+
+  int w = 0;
+  int h = 0;
+  glfwGetFramebufferSize(window, &w, &h);
+  glViewport(0, 0, w, h);
 
   float xScale = 1.0f;
   float yScale = 1.0f;

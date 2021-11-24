@@ -18,6 +18,12 @@ Game::Game(uv_loop_t* loop, GLFWwindow* window, int fontSize)
   , m_physicsTimer(loop, &m_physicsCallback)
 {}
 
+bool
+Game::compileShaders(std::ostream& errStream)
+{
+  return m_scene.compileShaders(errStream);
+}
+
 void
 Game::connectEventObservers(CompositeGLFWEventObserver* compositeEventObserver)
 {

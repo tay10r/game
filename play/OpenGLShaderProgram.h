@@ -8,8 +8,6 @@
 
 #include <cassert>
 
-namespace sf {
-
 class OpenGLShaderProgram
 {
 public:
@@ -147,5 +145,3 @@ private:
 
   GLuint m_programID = 0;
 };
-
-} // namespace sf
