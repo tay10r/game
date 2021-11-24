@@ -11,12 +11,10 @@ before_build:
 
 build:
   project: build-%CONFIGURATION%\game.sln
+  verbosity: minimal
 
 after_build:
   - cmd: cd build-%CONFIGURATION% && cpack -G ZIP -C %CONFIGURATION%
-
-build:
-  verbosity: minimal
 
 cache:
   - Debug-build\_deps
