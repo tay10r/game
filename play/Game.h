@@ -2,6 +2,8 @@
 
 #include <GLFW/glfw3.h>
 
+#include "Camera.h"
+#include "GLFWCameraProxy.h"
 #include "Scene.h"
 #include "UVTimer.h"
 
@@ -77,6 +79,8 @@ public:
 
   void runPhysics();
 
+  void updateInput();
+
   void start();
 
   void stop();
@@ -130,6 +134,10 @@ private:
   UVTimer m_renderTimer;
 
   UVTimer m_physicsTimer;
+
+  Camera<float> m_camera;
+
+  GLFWCameraProxy<float> m_cameraProxy;
 
   Scene m_scene;
 };

@@ -11,7 +11,7 @@
 #include <vector>
 
 template<typename Float>
-class FlyCamera final
+class Camera final
 {
 public:
   using mat3 = glm::tmat3x3<Float>;
@@ -24,15 +24,35 @@ public:
 
   using vec4 = glm::tvec4<Float>;
 
+  Float verticalFov() const noexcept { return m_verticalFov; }
+
+  Float aspectRatio() const noexcept { return m_aspect; }
+
+  Float near() const noexcept { return m_near; }
+
+  Float far() const noexcept { return m_far; }
+
+  void setAspectRatio(Float aspect) { m_aspect = aspect; }
+
+  void setVerticalFov(Float fov) { m_verticalFov = fov; }
+
+  void setNearPlane(Float near) { m_near = near; }
+
+  void setFarPlane(Float far) { m_far = far; }
+
+  mat4 perspective() const noexcept { return glm::perspective(m_verticalFov, m_aspect, m_near, m_far); }
+
   vec3 position() const { return m_position; }
 
-  vec3 upVector() const;
+  vec3 up() const;
 
-  vec3 forwardVector() const;
+  vec3 forward() const;
 
-  vec3 rightVector() const;
+  vec3 right() const;
 
   mat4 worldToCameraMatrix() const;
+
+  mat3 worldToCameraRotation() const;
 
   mat4 cameraToWorldMatrix() const;
 
@@ -61,39 +81,54 @@ private:
   Float m_yaw = 0;
 
   vec3 m_position = vec3(0, 0, 0);
+
+  Float m_aspect = Float(1);
+
+  Float m_verticalFov = glm::radians(Float(45));
+
+  Float m_near = Float(0.1);
+
+  Float m_far = Float(1000);
 };
 
 template<typename Float>
 glm::tvec3<Float>
-FlyCamera<Float>::forwardVector() const
+Camera<Float>::forward() const
 {
   return sphericalToXYZ(m_pitch, m_yaw);
 }
 
 template<typename Float>
 glm::tvec3<Float>
-FlyCamera<Float>::upVector() const
+Camera<Float>::up() const
 {
   return sphericalToXYZ(m_pitch - (Pi<Float>::value() / 2), m_yaw);
 }
 
 template<typename Float>
 glm::tvec3<Float>
-FlyCamera<Float>::rightVector() const
+Camera<Float>::right() const
 {
-  return glm::normalize(glm::cross(forwardVector(), upVector()));
+  return glm::normalize(glm::cross(forward(), up()));
 }
 
 template<typename Float>
 glm::tmat4x4<Float>
-FlyCamera<Float>::worldToCameraMatrix() const
+Camera<Float>::worldToCameraMatrix() const
 {
-  return glm::lookAt(m_position, m_position + forwardVector(), vec3(0, 1, 0));
+  return glm::lookAt(m_position, m_position + forward(), vec3(0, 1, 0));
+}
+
+template<typename Float>
+glm::tmat3x3<Float>
+Camera<Float>::worldToCameraRotation() const
+{
+  return glm::mat3(right(), up(), forward());
 }
 
 template<typename Float>
 void
-FlyCamera<Float>::applyMouseMotion(vec2 motion)
+Camera<Float>::applyMouseMotion(vec2 motion)
 {
   const Float pitchDelta = motion.y * m_rotationSpeed.y;
 
@@ -110,7 +145,7 @@ FlyCamera<Float>::applyMouseMotion(vec2 motion)
 
 template<typename Float>
 void
-FlyCamera<Float>::applyRelativeMove(vec3 relativeMove)
+Camera<Float>::applyRelativeMove(vec3 relativeMove)
 {
   m_position += relativeMove;
 }

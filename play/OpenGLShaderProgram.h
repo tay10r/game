@@ -8,7 +8,7 @@
 
 #include <cassert>
 
-class OpenGLShaderProgram
+class OpenGLShaderProgram final
 {
 public:
   static OpenGLShaderProgram null() { return OpenGLShaderProgram(Null{}); }
@@ -72,6 +72,15 @@ public:
     assert(location >= 0);
 
     glUniform3f(location, value.x, value.y, value.z);
+  }
+
+  void setUniformValue(GLint location, const glm::mat3& value)
+  {
+    assert(m_boundFlag);
+
+    assert(location >= 0);
+
+    glUniformMatrix3fv(location, 1, GL_FALSE, (const float*)&value[0]);
   }
 
   void setUniformValue(GLint location, const glm::mat4& value)

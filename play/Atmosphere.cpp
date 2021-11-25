@@ -9,12 +9,14 @@ const char* gVertShader = R"(
 
 layout(location = 0) in vec2 position;
 
-out highp vec2 texCoords;
+uniform highp mat3 rotation;
+
+out highp vec3 direction;
 
 void
 main()
 {
-  texCoords = position;
+  direction = rotation * vec3((position.xy * 2.0) - 1.0, -1.0);
 
   gl_Position = vec4((position.xy * 2.0) - 1.0, 0.0, 1.0);
 }
@@ -23,7 +25,7 @@ main()
 const char* gFragShader = R"(
 #version 300 es
 
-in highp vec2 texCoords;
+in highp vec3 direction;
 
 out lowp vec4 outColor;
 
@@ -45,10 +47,8 @@ main()
 {
   highp vec3 uSunPos = vec3(1, 1, 1);
 
-  highp vec3 vPosition = vec3((texCoords * 2.0) - 1.0, -1.0);
-
   highp vec3 color = atmosphere(
-      normalize(vPosition),           // normalized ray direction
+      normalize(direction),           // normalized ray direction
       vec3(0,6372e3,0),               // ray origin
       uSunPos,                        // position of the sun
       22.0,                           // intensity of the sun
@@ -251,7 +251,23 @@ Atmosphere::compileShaderProgram(std::ostream& errStream)
     return false;
   }
 
+  m_program.bind();
+
+  m_rotationLocation = m_program.getUniformLocation("rotation");
+
+  m_program.unbind();
+
   return true;
+}
+
+void
+Atmosphere::setRotation(const glm::mat3& rotation)
+{
+  m_program.bind();
+
+  m_program.setUniformValue(m_rotationLocation, rotation);
+
+  m_program.unbind();
 }
 
 void

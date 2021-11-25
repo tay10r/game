@@ -1,5 +1,7 @@
 #include "Scene.h"
 
+#include "Camera.h"
+
 bool
 Scene::compileShaders(std::ostream& errStream)
 {
@@ -10,8 +12,10 @@ Scene::compileShaders(std::ostream& errStream)
 }
 
 void
-Scene::render()
+Scene::render(const Camera<float>& camera)
 {
+  m_atmosphere.setRotation(camera.worldToCameraRotation());
+
   m_atmosphere.render();
 }
 

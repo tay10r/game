@@ -16,6 +16,7 @@ Game::Game(uv_loop_t* loop, GLFWwindow* window, int fontSize)
   , m_inputTimer(loop, &m_inputCallback)
   , m_renderTimer(loop, &m_renderCallback)
   , m_physicsTimer(loop, &m_physicsCallback)
+  , m_cameraProxy(&m_camera)
 {}
 
 bool
@@ -28,6 +29,8 @@ void
 Game::connectEventObservers(CompositeGLFWEventObserver* compositeEventObserver)
 {
   compositeEventObserver->addEventObserver(&m_menuCallback);
+
+  compositeEventObserver->addEventObserver(&m_cameraProxy);
 }
 
 void
@@ -52,7 +55,7 @@ Game::render()
 void
 Game::renderGame()
 {
-  m_scene.render();
+  m_scene.render(m_camera);
 }
 
 void
@@ -156,6 +159,12 @@ Game::stop()
 }
 
 void
+Game::updateInput()
+{
+  m_cameraProxy.update();
+}
+
+void
 GameRenderCallback::onTimeout(UVTimer*)
 {
   m_game->render();
@@ -185,6 +194,8 @@ void
 GameInputCallback::onTimeout(UVTimer*)
 {
   glfwPollEvents();
+
+  m_game->updateInput();
 
   if (m_game->windowShouldClose())
     m_game->stop();
