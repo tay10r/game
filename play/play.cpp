@@ -62,6 +62,8 @@ displayShaderErrors(GLFWwindow* window, const std::string& errorLog)
 bool
 play(GLFWwindow* window, CompositeGLFWEventObserver* compositeEventObserver, const char* profilePath, int fontSize)
 {
+  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
   uv_loop_t loop;
 
   uv_loop_init(&loop);

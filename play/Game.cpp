@@ -37,6 +37,11 @@ void
 Game::toggleMenu()
 {
   m_menuEnabled = !m_menuEnabled;
+
+  if (m_menuEnabled)
+    glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+  else
+    glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
 void
@@ -182,10 +187,11 @@ GameMenuCallback::keyPressEvent(int key, int scancode, int mods)
   if (key != GLFW_KEY_ESCAPE)
     return;
 
-  if (m_game->menuEnabled())
+  if (m_game->menuEnabled()) {
     m_game->startPhysics();
-  else
+  } else {
     m_game->stopPhysics();
+  }
 
   m_game->toggleMenu();
 }
