@@ -62,6 +62,8 @@ displayShaderErrors(GLFWwindow* window, const std::string& errorLog)
 bool
 play(GLFWwindow* window, CompositeGLFWEventObserver* compositeEventObserver, const char* profilePath, int fontSize)
 {
+  glEnable(GL_SAMPLES);
+
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
   uv_loop_t loop;
@@ -73,6 +75,8 @@ play(GLFWwindow* window, CompositeGLFWEventObserver* compositeEventObserver, con
   std::ostringstream shaderErrorLog;
 
   if (!game.compileShaders(shaderErrorLog)) {
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    glDisable(GL_SAMPLES);
     displayShaderErrors(window, shaderErrorLog.str());
     uv_loop_close(&loop);
     return false;
@@ -87,6 +91,10 @@ play(GLFWwindow* window, CompositeGLFWEventObserver* compositeEventObserver, con
   game.stop();
 
   uv_loop_close(&loop);
+
+  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+
+  glDisable(GL_SAMPLES);
 
   return false;
 }

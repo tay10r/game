@@ -6,15 +6,13 @@
 
 #include <glm/glm.hpp>
 
+#include <map>
+
 #include <cassert>
 
 class OpenGLShaderProgram final
 {
 public:
-  static OpenGLShaderProgram null() { return OpenGLShaderProgram(Null{}); }
-
-  static OpenGLShaderProgram makeSimpleProgram(const char* vertSource, const char* fragSource, std::ostream& errStream);
-
   OpenGLShaderProgram()
     : m_programID(glCreateProgram())
   {}
@@ -34,6 +32,8 @@ public:
     if (m_programID > 0)
       glDeleteProgram(m_programID);
   }
+
+  bool compileSimpleProgram(const char* vertSource, const char* fragSource, std::ostream& errStream);
 
   bool isNull() const { return !m_programID; }
 
@@ -65,6 +65,12 @@ public:
 
   bool isBound() const { return m_boundFlag; }
 
+  template<typename Value>
+  void setUniformValue(const char* name, const Value& value)
+  {
+    setUniformValue(getUniformLocation(name), value);
+  }
+
   void setUniformValue(GLint location, const glm::vec3& value)
   {
     assert(m_boundFlag);
@@ -92,11 +98,21 @@ public:
     glUniformMatrix4fv(location, 1, GL_FALSE, (const float*)&value[0]);
   }
 
-  GLint getUniformLocation(const char* name) const
+  GLint getUniformLocation(const char* name)
   {
     assert(m_boundFlag);
 
-    return glGetUniformLocation(m_programID, name);
+    auto it = m_varMap.find(name);
+    if (it != m_varMap.end())
+      return it->second;
+
+    const GLint loc = glGetUniformLocation(m_programID, name);
+
+    assert(loc >= 0);
+
+    m_varMap.emplace(name, loc);
+
+    return loc;
   }
 
   GLuint getProgramID() { return m_programID; }
@@ -153,4 +169,6 @@ private:
   bool m_boundFlag = false;
 
   GLuint m_programID = 0;
+
+  std::map<const char*, GLint> m_varMap;
 };

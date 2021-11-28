@@ -4,8 +4,6 @@
 
 #include <glm/fwd.hpp>
 
-namespace sf {
-
 class OpenGLTexture2D final
 {
 public:
@@ -21,13 +19,9 @@ public:
   {
     assert(m_boundFlag);
     GLint value = 0;
-    glGetTexLevelParameteriv(GL_TEXTURE_2D, level, parameterName, &value);
+    glGetTexParameteriv(GL_TEXTURE_2D, parameterName, &value);
     return value;
   }
-
-  GLint getWidth(GLint level) const { return getIntegerParameter(level, GL_TEXTURE_WIDTH); }
-
-  GLint getHeight(GLint level) const { return getIntegerParameter(level, GL_TEXTURE_HEIGHT); }
 
   /// Opens an image file and loads the data onto the texture.
   ///
@@ -67,5 +61,3 @@ private:
 
   bool m_boundFlag = false;
 };
-
-} // namespace sf

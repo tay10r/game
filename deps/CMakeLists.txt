@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.9.6)
 project(deps)
 
 add_subdirectory(platformfolders)
+add_subdirectory(stb)
 
 include(FetchContent)
 

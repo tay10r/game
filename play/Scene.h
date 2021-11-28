@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Atmosphere.h"
+#include "Terrain.h"
 
 template<typename Float>
 class Camera;
@@ -12,8 +13,12 @@ public:
 
   void render(const Camera<float>& camera);
 
+  void renderGui();
+
   void runPhysics();
 
 private:
   Atmosphere m_atmosphere;
+
+  Terrain m_terrain;
 };

@@ -90,6 +90,8 @@ Game::renderMenu()
 
   ImGui::End();
 
+  m_scene.renderGui();
+
   ImGui::Render();
 
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

@@ -17,8 +17,6 @@ public:
   void setRotation(const glm::mat3& rotation);
 
 private:
-  GLint m_rotationLocation = -1;
-
   OpenGLShaderProgram m_program;
 
   OpenGLVertexBuffer<glm::vec2> m_vertexBuffer;

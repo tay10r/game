@@ -6,8 +6,6 @@
 
 #include <cassert>
 
-namespace sf {
-
 OpenGLTexture2D::OpenGLTexture2D()
 {
   glGenTextures(1, &m_textureID);
@@ -141,5 +139,3 @@ OpenGLTexture2D::write(GLint level, GLint x, GLint y, GLint w, GLint h, const gl
 {
   write(level, x, y, w, h, GL_RGBA, GL_FLOAT, rgba);
 }
-
-} // namespace sf

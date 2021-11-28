@@ -16,9 +16,9 @@ out highp vec3 direction;
 void
 main()
 {
-  direction = rotation * vec3((position.xy * 2.0) - 1.0, -1.0);
+  direction = rotation * (vec3((position * 2.0) - 1.0, 1.0) * vec3(1, -1, 1));
 
-  gl_Position = vec4((position.xy * 2.0) - 1.0, 0.0, 1.0);
+  gl_Position = vec4(((position.xy * 2.0) - 1.0) * vec2(1.0, -1.0), 0.0, 1.0);
 }
 )";
 
@@ -49,7 +49,7 @@ main()
 
   highp vec3 color = atmosphere(
       normalize(direction),           // normalized ray direction
-      vec3(0,6372e3,0),               // ray origin
+      vec3(0.0, 6371e3 + 1.0, 0.0),               // ray origin
       uSunPos,                        // position of the sun
       22.0,                           // intensity of the sun
       6371e3,                         // radius of the planet in meters
@@ -251,12 +251,6 @@ Atmosphere::compileShaderProgram(std::ostream& errStream)
     return false;
   }
 
-  m_program.bind();
-
-  m_rotationLocation = m_program.getUniformLocation("rotation");
-
-  m_program.unbind();
-
   return true;
 }
 
@@ -265,7 +259,7 @@ Atmosphere::setRotation(const glm::mat3& rotation)
 {
   m_program.bind();
 
-  m_program.setUniformValue(m_rotationLocation, rotation);
+  m_program.setUniformValue("rotation", rotation);
 
   m_program.unbind();
 }
@@ -282,4 +276,6 @@ Atmosphere::render()
   m_program.unbind();
 
   m_vertexBuffer.unbind();
+
+  glClear(GL_DEPTH_BUFFER_BIT);
 }
